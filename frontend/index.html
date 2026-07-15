@@ -46,7 +46,13 @@
 			}
 		}
 
-		function saveTasks(tasks){ localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)) }
+		function saveTasks(tasks){
+			try{
+				localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+			}catch(e){
+				console.warn('Unable to persist tasks to localStorage', e);
+			}
+		}
 
 		function render(){
 			const tasks = loadTasks();
