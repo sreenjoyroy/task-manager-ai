@@ -56,7 +56,7 @@
 			count.textContent = tasks.length ? `${tasks.length} task(s)` : 'No tasks'
 		}
 
-		addBtn.addEventListener('click', ()=>{
+		function addTask(){
 			const v = input.value.trim();
 			if(!v) return;
 			const tasks = loadTasks();
@@ -64,15 +64,16 @@
 			saveTasks(tasks);
 			input.value = '';
 			render();
-		});
+		}
+
+		addBtn.addEventListener('click', addTask);
 
 		clearBtn.addEventListener('click', ()=>{
 			localStorage.removeItem(STORAGE_KEY);
 			render();
 		});
 
-		input.addEventListener('keydown', e=>{ if(e.key === 'Enter') addBtn.click(); });
-
+		input.addEventListener('keydown', e=>{ if(e.key === 'Enter') addTask(); });
 		render();
 	</script>
 </body>
