@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>Task Manager</title>
+	<style>
+		body{font-family:system-ui,Segoe UI,Roboto,Arial;margin:24px}
+		.container{max-width:600px;margin:0 auto}
+		input[type=text]{width:70%;padding:8px;margin-right:8px}
+		button{padding:8px 12px}
+		ul{list-style:none;padding:0}
+		li{padding:8px;border:1px solid #eee;margin-top:8px;display:flex;justify-content:space-between;align-items:center}
+		.muted{color:#666;font-size:0.9rem}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h1>Tasks</h1>
+		<div>
+			<input id="taskInput" type="text" placeholder="Enter a task" aria-label="Task" />
+			<button id="addBtn">Add</button>
+			<button id="clearBtn">Clear</button>
+		</div>
+		<p class="muted" id="count" aria-live="polite"></p>
+		<ul id="taskList"></ul>
+	</div>
+
+	<script>
+		const input = document.getElementById('taskInput');
+		const addBtn = document.getElementById('addBtn');
+		const clearBtn = document.getElementById('clearBtn');
+		const list = document.getElementById('taskList');
+		const count = document.getElementById('count');
+
+		const STORAGE_KEY = 'tasks_v1';
+
+		function loadTasks(){
+			try{
+				const raw = localStorage.getItem(STORAGE_KEY);
+				if(!raw) return [];
+				const parsed = JSON.parse(raw);
+				return Array.isArray(parsed) ? parsed : [];
+			}catch(e){
+				return [];
+			}
+		}
+
+		function saveTasks(tasks){
+			try{
+				localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+			}catch(e){
+				console.warn('Unable to persist tasks to localStorage', e);
+			}
+		}
+
+		function render(){
+			const tasks = loadTasks();
+			list.innerHTML = '';
+			tasks.forEach((t, i)=>{
+				const li = document.createElement('li');
+				li.textContent = t;
+				const btn = document.createElement('button');
+				btn.textContent = 'Delete';
+				btn.onclick = ()=>{ tasks.splice(i,1); saveTasks(tasks); render(); };
+				li.appendChild(btn);
+				list.appendChild(li);
+			});
+			count.textContent = tasks.length ? `${tasks.length} task(s)` : 'No tasks'
+		}
+
+		function addTask(){
+			const v = input.value.trim();
+			if(!v) return;
+			const tasks = loadTasks();
+			tasks.push(v);
+			saveTasks(tasks);
+			input.value = '';
+			render();
+		}
+
+		addBtn.addEventListener('click', addTask);
+
+		clearBtn.addEventListener('click', ()=>{
+			localStorage.removeItem(STORAGE_KEY);
+			render();
+		});
+
+		input.addEventListener('keydown', e=>{ if(e.key === 'Enter') addTask(); });
+		render();
+	</script>
+</body>
+</html>
