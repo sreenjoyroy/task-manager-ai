@@ -4,7 +4,8 @@
   "description": "Express-based task management API",
   "main": "backend/app.js",
   "scripts": {
-    "start": "node backend/app.js"
+    "start": "node backend/app.js",
+    "build": "node --check backend/app.js"
   },
   "dependencies": {
     "express": "^4.22.2"
